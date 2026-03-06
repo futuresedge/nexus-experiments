@@ -333,50 +333,50 @@ Walking the task sequence reveals four agent classes not previously in the roste
 ***
 
 ### `ProjectRegistrar`
-**Type:** EXECUTOR
-**Zone:** 0
-**Job:** Translates a human:director project brief into a structured, machine-readable project manifest.
-**READS:** project brief (human input, freeform), `project-manifest.template.md`
-**WRITES:** `project-manifest.md`
-**NEVER:** environment contract, agent files, pattern library
-**Key skill:** `project-registration.skill.md` — knows what fields are required, how to identify missing inputs, how to raise uncertainty for ambiguous inputs without inventing values
-**Reviewer:** `human:director` (not an agent — this is a Tier 4 gate by nature: the human reviews their own intent, restated)
+- **Type:** EXECUTOR
+- **Zone:** 0
+- **Job:** Translates a human:director project brief into a structured, machine-readable project manifest.
+- **READS:** project brief (human input, freeform), `project-manifest.template.md`
+- **WRITES:** `project-manifest.md`
+- **NEVER:** environment contract, agent files, pattern library
+- **Key skill:** `project-registration.skill.md` — knows what fields are required, how to identify missing inputs, how to raise uncertainty for ambiguous inputs without inventing values
+- **Reviewer:** `human:director` (not an agent — this is a Tier 4 gate by nature: the human reviews their own intent, restated)
 
 ***
 
 ### `EnvironmentContractAuthor`
-**Type:** EXECUTOR
-**Zone:** 0
-**Job:** Writes a complete, verifiable environment contract from a project manifest's tech stack declaration.
-**READS:** `project-manifest.md`, `environment-contract.template.md`
-**WRITES:** `environment-contract.md`
-**NEVER:** project manifest, agent files, pattern library
-**Key skill:** `environment-contract-writing.skill.md` — knows required fields per tech stack type (static site, API, full-stack, etc.), knows what "verifiable" means per field
-**Reviewer:** `EnvironmentReviewer` (already in roster — this is the first of its two activation contexts)
+- **Type:** EXECUTOR
+- **Zone:** 0
+- **Job:** Writes a complete, verifiable environment contract from a project manifest's tech stack declaration.
+- **READS:** `project-manifest.md`, `environment-contract.template.md`
+- **WRITES:** `environment-contract.md`
+- **NEVER:** project manifest, agent files, pattern library
+- **Key skill:** `environment-contract-writing.skill.md` — knows required fields per tech stack type (static site, API, full-stack, etc.), knows what "verifiable" means per field
+- **Reviewer:** `EnvironmentReviewer` (already in roster — this is the first of its two activation contexts)
 
 ***
 
 ### `PatternSeeder`
-**Type:** EXECUTOR
-**Zone:** 0
-**Job:** Produces initial Pattern Library entries for a declared tech stack, drawing on tech stack knowledge and the pattern schema.
-**READS:** `environment-contract.md`, `project-manifest.md`, pattern library schema
-**WRITES:** pattern library entries (CANDIDATE status)
-**NEVER:** project manifest, environment contract, agent files
-**Key skill:** `pattern-seeding.skill.md` — knows the pattern schema, knows how to identify genuinely reusable patterns vs project-specific one-offs, knows the evidence threshold for PROVISIONAL promotion
-**Reviewer:** `FrameworkOwner` (promotes candidates to PROVISIONAL)
+- **Type:** EXECUTOR
+- **Zone:** 0
+- **Job:** Produces initial Pattern Library entries for a declared tech stack, drawing on tech stack knowledge and the pattern schema.
+- **READS:** `environment-contract.md`, `project-manifest.md`, pattern library schema
+- **WRITES:** pattern library entries (CANDIDATE status)
+- **NEVER:** project manifest, environment contract, agent files
+- **Key skill:** `pattern-seeding.skill.md` — knows the pattern schema, knows how to identify genuinely reusable patterns vs project-specific one-offs, knows the evidence threshold for PROVISIONAL promotion
+- **Reviewer:** `FrameworkOwner` (promotes candidates to PROVISIONAL)
 
 ***
 
 ### `BootstrapValidator`
-**Type:** REVIEWER
-**Zone:** 0
-**Job:** Verifies that Zone 0 is complete and the framework is operational for this project, against the bootstrap completion checklist.
-**READS:** All Zone 0 outputs (manifest, contract, all agent files, pattern library entries), bootstrap checklist
-**WRITES:** `bootstrap-report.md`
-**NEVER:** any Zone 0 output document (reviewer — reads only)
-**Key skill:** `bootstrap-validation.skill.md` — knows how to run the smoke test, knows the completion checklist, knows how to distinguish "file exists" from "file is functional"
-**Reviewer:** `human:director`
+- **Type:** REVIEWER
+- **Zone:** 0
+- **Job:** Verifies that Zone 0 is complete and the framework is operational for this project, against the bootstrap completion checklist.
+- **READS:** All Zone 0 outputs (manifest, contract, all agent files, pattern library entries), bootstrap checklist
+- **WRITES:** `bootstrap-report.md`
+- **NEVER:** any Zone 0 output document (reviewer — reads only)
+- **Key skill:** `bootstrap-validation.skill.md` — knows how to run the smoke test, knows the completion checklist, knows how to distinguish "file exists" from "file is functional"
+- **Reviewer:** `human:director`
 
 ***
 
