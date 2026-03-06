@@ -1,0 +1,110 @@
+# @format
+
+# open-questions-register.yaml
+# Created: Step 1, Task 1.2
+# Persists through: Steps 1–6
+
+questions:
+  - questionid: OQ-1-01
+    field: techstack
+    gap_type: AMBIGUOUS-INCOMPLETE
+    gap: "AstroJS version not specified"
+    impact: "Step 2 framework.version cannot be completed without a specific or minimum version"
+    source_statements: [S-04]
+    classification: BLOCKER
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-02
+    field: techstack
+    gap_type: AMBIGUOUS-INCOMPLETE
+    gap: "React integration implied by Shadcn dependency but not explicitly declared as a stack element"
+    impact: "Step 2 cannot enumerate all dependencies for install commands and config entries"
+    source_statements: [S-04]
+    classification: BLOCKER
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-03
+    field: techstack
+    gap_type: AMBIGUOUS-INCOMPLETE
+    gap: "Package manager unconfirmed — npm stated as default, pnpm cited as acceptable alternative"
+    impact: "Step 2 runtime.packagemanager and runtime.installcommand require a single confirmed value"
+    source_statements: [S-09]
+    classification: BLOCKER
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-04
+    field: deploymenttarget
+    gap_type: AMBIGUOUS-INCOMPLETE
+    gap: "Cloudflare Workers named but technical target may be Cloudflare Pages given static constraint"
+    impact: "Step 2 deployment section structure differs entirely between Workers and Pages"
+    source_statements: [S-02]
+    classification: BLOCKER
+    linked_questions: [OQ-1-05]
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-05
+    field: deploymenttarget
+    gap_type: CONTRADICTION
+    gap: "Cloudflare Workers implies edge compute adapter incompatible with AstroJS output:static; static constraint requires output:static"
+    impact: "AstroJS output mode and adapter selection cannot be determined; entire Step 2 deployment and framework sections blocked"
+    source_statements: [S-02, S-03]
+    contradiction_ref: C-01
+    classification: BLOCKER
+    linked_questions: [OQ-1-04]
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-06
+    field: devenvironment
+    gap_type: AMBIGUOUS-INCOMPLETE
+    gap: "Node.js runtime version unknown — human stated they do not know the exact version"
+    impact: "Step 2 runtime.version requires an exact or minimum version; field cannot be completed"
+    source_statements: [S-11]
+    classification: BLOCKER
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-07
+    field: appetite
+    gap_type: AMBIGUOUS-FORMAT
+    gap: "Appetite stated as 'within a week' — not a valid enum value (valid: small/medium/large)"
+    impact: "REQUIRED field cannot be validly populated; manifest fails DoD 3"
+    source_statements: [S-15]
+    classification: BLOCKER
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-08
+    field: integrationrequirements
+    gap_type: AMBIGUOUS-INCOMPLETE
+    gap: "Form handler provider tentative — Formspree mentioned but not confirmed"
+    impact: "Step 2 services section conditionally required when form handler referenced; provider name and integration method cannot be specified"
+    source_statements: [S-08]
+    classification: WARNING
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN
+
+  - questionid: OQ-1-09
+    field: null
+    gap_type: SCHEMA-GAP
+    gap: "Infrastructure readiness information present in brief but no manifest field exists"
+    impact: "Step 2 deployment section may incorrectly assume DNS procurement is needed; self-managed DNS not formally recorded"
+    source_statements: [S-13]
+    classification: WARNING
+    schema_gap_flag: true
+    candidate_field: existingInfrastructure
+    raisedbystep: 1
+    currentowner: 1
+    resolutionstatus: OPEN

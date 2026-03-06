@@ -1,0 +1,81 @@
+# @format
+
+# brief-inventory.yaml
+# Produced by: Task 1.1 | Input to: Task 1.2
+
+statements:
+  - id: S-01
+    text: "I need a single-page marketing website for my consulting practice, Meridian Consulting."
+    clarity: CLEAR
+    candidate_fields: [projectname, description]
+
+  - id: S-02
+    text: "Deploy to Cloudflare Workers on my domain."
+    clarity: AMBIGUOUS
+    candidate_fields: [deploymenttarget]
+
+  - id: S-03
+    text: "The site must be fully static — no server-side rendering."
+    clarity: CLEAR
+    candidate_fields: [constraints]
+
+  - id: S-04
+    text: "I want to build this with AstroJS using Shadcn components for the UI."
+    clarity: AMBIGUOUS # named but unversioned
+    candidate_fields: [techstack]
+
+  # ... all statements from the brief
+
+fields:
+  - field: projectname
+    required: true
+    coverage: PRESENT
+    supporting_statements: [S-01]
+
+  - field: techstack
+    required: true
+    coverage: AMBIGUOUS # named, unversioned; React integration implicit
+    supporting_statements: [S-04, S-05]
+
+  - field: deploymenttarget
+    required: true
+    coverage: AMBIGUOUS
+    supporting_statements: [S-02]
+
+  - field: devenvironment
+    required: true
+    coverage: AMBIGUOUS # OS and editor present; runtime version unknown
+    supporting_statements: [S-10, S-11, S-12]
+
+  - field: appetite
+    required: true
+    coverage: AMBIGUOUS # "within a week" present but not valid enum value
+    supporting_statements: [S-15]
+
+  - field: integrationrequirements
+    required: false
+    coverage: AMBIGUOUS # Formspree mentioned tentatively
+    supporting_statements: [S-08]
+
+  - field: existingassets
+    required: false
+    coverage: ABSENT
+    supporting_statements: []
+
+  # ... all schema fields
+
+non_mappable:
+  - statement_id: S-13
+    downstream_note: "Cloudflare account active, DNS control available — relevant to Step 2 deployment section"
+
+  - statement_id: S-16
+    downstream_note: "Maintainability for handoff — no schema field; candidate constraint entry"
+
+  - statement_id: S-17
+    downstream_note: "Design intent descriptors (typography, whitespace) attached to reference examples — exceed field schema"
+
+contradictions:
+  - id: C-01
+    statement_ids: [S-02, S-03]
+    description: "Cloudflare Workers implies edge compute adapter (incompatible with static output mode); static constraint requires output:static"
+    affected_fields: [deploymenttarget, constraints]
