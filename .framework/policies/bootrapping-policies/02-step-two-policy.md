@@ -1,8 +1,8 @@
 # Step 2 Policy: Environment Specification
 
-**Version:** 0.1 — Draft
-**Depends on:** Step 1 `project-manifest.md` in `APPROVED` status
-**Blocks:** Step 3 (Role Configuration) cannot begin until this step's output is accepted
+- **Version:** 0.1 — Draft
+- **Depends on:** Step 1 `project-manifest.md` in `APPROVED` status
+- **Blocks:** Step 3 (Role Configuration) cannot begin until this step's output is accepted
 
 ***
 
