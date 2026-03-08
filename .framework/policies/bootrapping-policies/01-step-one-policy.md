@@ -1,9 +1,5 @@
-Here is the policy document for Step 1. I'll flag items that sit above the steps at the end.
-
-***
-
 # Step 1 Policy: Project Intent Capture
-**Version:** 0.1 — Draft
+**Version:** 0.2 — Draft
 **Depends on:** None — this is the first step
 **Blocks:** Step 2 (Environment Specification) cannot begin until this step's output is in `APPROVED` status
 
@@ -37,16 +33,16 @@ These are the information elements the brief must contain, either directly or th
 
 | Information | Requirement | Absent = |
 |---|---|---|
-| Project name | **REQUIRED** | BLOCKING — no identifier for any downstream artefact |
-| Project description | **REQUIRED** | BLOCKING — scope is undefined |
-| Approach / technology declaration | **REQUIRED** | BLOCKING — Step 2 cannot begin; no basis for environment specification |
-| Deployment target | **REQUIRED** | BLOCKING — Step 2 cannot begin; deployment context missing |
-| Development environment | **REQUIRED** | BLOCKING — Step 2 cannot begin; local setup unknown |
-| Human actors and roles | **REQUIRED** | BLOCKING — governance is undefined; no approval authority identified |
-| Appetite declaration | **REQUIRED** | BLOCKING — scope cannot be bounded; project scale is unknown |
+| Project name | **REQUIRED** | BLOCKER — no identifier for any downstream artefact |
+| Project description | **REQUIRED** | BLOCKER — scope is undefined |
+| Approach / technology declaration | **REQUIRED** | BLOCKER — Step 2 cannot begin; no basis for environment specification |
+| Deployment target | **REQUIRED** | BLOCKER — Step 2 cannot begin; deployment context missing |
+| Development environment | **REQUIRED** | BLOCKER — Step 2 cannot begin; local setup unknown |
+| Human actors and roles | **REQUIRED** | BLOCKER — governance is undefined; no approval authority identified |
+| Appetite declaration | **REQUIRED** | BLOCKER — scope cannot be bounded; project scale is unknown |
 | Known constraints | OPTIONAL | WARNING — downstream work may violate unstated constraints |
-| Existing assets | OPTIONAL | LOW RISK — noted as absent; no downstream dependency |
-| Reference examples | OPTIONAL | LOW RISK — noted as absent; no downstream dependency |
+| Existing assets | OPTIONAL | INFO — noted as absent; no downstream dependency |
+| Reference examples | OPTIONAL | INFO — noted as absent; no downstream dependency |
 | Integration requirements | OPTIONAL | WARNING — may surface as gaps in environment specification |
 | Explicit out-of-scope declarations | OPTIONAL | WARNING — scope boundary is implied rather than stated |
 
@@ -54,9 +50,9 @@ These are the information elements the brief must contain, either directly or th
 
 Not all missing required information is identical. Before deciding whether to block or proceed:
 
-- If a required field is **absent**: it is `BLOCKING` — the step must obtain it before drafting the manifest
-- If a required field is **ambiguous** (present but unclear): classify against this test — *would getting this wrong cause Step 2 or Step 3 to fail?* If yes, it is `BLOCKING`. If no, it is an `OPEN_QUESTION` in the output
-- If a required field is **in conflict** with another element of the brief: it is `BLOCKING` — contradictions must be resolved before drafting, never silently resolved by choosing one interpretation
+- If a required field is **absent**: it is `BLOCKER` — the step must obtain it before drafting the manifest
+- If a required field is **ambiguous** (present but unclear): classify against this test — *would getting this wrong cause Step 2 or Step 3 to fail?* If yes, it is `BLOCKER`. If no, it is an open question in the output
+- If a required field is **in conflict** with another element of the brief: it is `BLOCKER` — contradictions must be resolved before drafting, never silently resolved by choosing one interpretation
 
 ### Detailed Input Specifications
 
@@ -68,14 +64,14 @@ Not all missing required information is identical. Before deciding whether to bl
 | **Source** | Must originate from `human:director`, not an intermediary or synthesised summary |
 | **Version** | If multiple versions exist, the most recent version supersedes earlier versions entirely; all versions must be on record |
 | **Language** | Must be interpretable without domain expertise the structuring process does not possess — if the brief requires specialist knowledge to interpret, that is a gap to surface, not to fill |
-| **Completeness** | The brief does not need to be complete to be valid as an input — gaps become `BLOCKING` items or `OPEN_QUESTIONS` in the output |
+| **Completeness** | The brief does not need to be complete to be valid as an input — gaps become `BLOCKER` items or open questions in the output |
 
 #### Feedback channel to `human:director`
 
 | Criterion | Requirement |
 |---|---|
-| **Availability** | Must be accessible during this step to resolve `BLOCKING` gaps |
-| **Format** | Questions must be specific and singular — one question per blocking item, not a consolidated list that the human must parse |
+| **Availability** | Must be accessible during this step to resolve `BLOCKER` gaps |
+| **Format** | One question per gap — each gap produces exactly one question — all questions delivered in a single batch exchange (see FC-3). Questions must be specific and singular, not compound. |
 | **Record** | Every question asked and every answer received must be recorded with attribution and timestamp |
 | **Scope** | The channel is used only for resolving gaps in the brief — not for design decisions, not for scope negotiation, not for preference-gathering |
 
@@ -95,16 +91,18 @@ Not all missing required information is identical. Before deciding whether to bl
 
 | Output | Requirement | If Absent or Incomplete |
 |---|---|---|
-| `project-manifest.md` in `APPROVED` status | **REQUIRED** | BLOCKER — Step 1 is not done |
+| `project-manifest.yaml` in `APPROVED` status | **REQUIRED** | BLOCKER — Step 1 is not done |
+| `open-questions-register.yaml` created and populated | **REQUIRED** | BLOCKER — gap tracking has no canonical home; carry-forward to Step 2 is broken |
 | All required fields non-empty or explicitly documented as open questions | **REQUIRED** | BLOCKER — manifest is structurally incomplete |
 | `open_questions` entries for every identified gap and ambiguity | **REQUIRED** | WARNING — untracked gaps will surface uncontrolled in later steps |
 | Source traceability for all field values | **REQUIRED** | BLOCKER — no way to verify the no-invention constraint was met |
 | Approval timestamp attributed to `human:director` | **REQUIRED** | BLOCKER — approval is a claim without evidence |
+| `approval_statement` verbatim from `human:director` | **REQUIRED** | BLOCKER — FC-4 Tier 1 requires deliberate evidence of approval, not just a status field |
 | Optional fields populated where the brief contained relevant information | EXPECTED | WARNING — information was available but not captured |
 
 ### Detailed Output Specifications
 
-#### `project-manifest.md` — schema
+#### `project-manifest.yaml` — schema
 
 Every field listed below must be present in the document. Required fields must be non-empty. Optional fields must be present in the document even if empty — use `none stated` or an empty list `[]`, never omit the field.
 
@@ -115,16 +113,21 @@ Every field listed below must be present in the document. Required fields must b
 | `description` | String | **REQUIRED** | 2–4 sentences; drawn from the brief without addition; if the brief is vague, write what was said and flag in `open_questions` |
 | `tech_stack` | List of strings | **REQUIRED** | Named technologies only — not categories. `AstroJS 5.x` is valid; `modern frontend stack` is not. Minimum one entry. |
 | `deployment_target` | String | **REQUIRED** | Named deployment provider and target; minimum provider name; ideally includes URL and staging/production distinction |
-| `dev_environment` | Object | **REQUIRED** | Minimum: OS, runtime, package manager. Ideally: editor, start command, any local setup notes |
+| `dev_environment` | Object | **REQUIRED** | Minimum: OS, runtime, package manager. Note: package managers (e.g. `pnpm`) may appear in both `tech_stack` and `dev_environment.package_manager` — duplication is intentional and permitted. Ideally: editor, start command, any local setup notes |
 | `human_actors` | List of objects | **REQUIRED** | Minimum one entry. Each entry: `name`, `role`. Valid roles: `human:director`, `human:approver`, or `other:[description]`. One `human:director` must exist. `human:director` and `human:approver` may be the same person — record both roles on one entry |
-| `appetite` | Enum | **REQUIRED** | One of: `small` (days), `medium` (1–2 weeks), `large` (multi-week). If `human:director` stated a specific duration, record it verbatim. Do not infer from apparent scope. |
+| `appetite` | Enum | **REQUIRED** | One of: `small` (days), `medium` (1–2 weeks), `large` (multi-week). If `human:director` stated a specific duration, record it verbatim in `open_questions` alongside the enum value. Do not infer from apparent scope — absent or invalid appetite is a Gate 3 BLOCKER regardless of downstream step dependency. |
+| `existing_infrastructure` | Object | OPTIONAL | Any pre-existing setup relevant to deployment or hosting: registered domains, existing hosting accounts, DNS control. No current field = `schema_gap_flag: true` in the register. |
+| `success_criteria` | List of strings | OPTIONAL | `human:director`'s explicit definition of done for the project. If absent, note in `open_questions`. |
 | `constraints` | List of strings | OPTIONAL | Only constraints explicitly stated by `human:director`; do not infer from the tech stack |
 | `out_of_scope` | List of strings | OPTIONAL | Only what `human:director` explicitly excluded; absence of mention ≠ out of scope |
-| `open_questions` | List of objects | OPTIONAL — but often non-empty | Each entry: `field` (which manifest field), `gap` (what is missing or unclear), `impact` (what fails downstream), `classification` (`BLOCKING_RESOLVED`, `WARNING`, or `LOW_RISK`) |
-| `status` | Enum | **REQUIRED** | Set to `DRAFT` on creation. Set to `APPROVED` only by `human:director` action. Never self-set to `APPROVED`. |
+| `integration_requirements` | Object | OPTIONAL | External services or integrations referenced in the brief. If mentioned but unconfirmed, record what was said, note it is tentative, and cross-reference the open question ID. Do not record a tentative value as confirmed. |
+| `reference_examples` | List of strings | OPTIONAL | Named examples cited by `human:director`. Named examples with qualitative descriptors (e.g. "like Airbnb but simpler") captured as-stated; descriptors that cannot be mapped to a field go to `non_mappable`. |
+| `open_questions` | List of objects | OPTIONAL — but often non-empty | Full schema per entry: `question_id`, `field`, `gap`, `gap_type` (`ABSENT`\|`AMBIGUOUS-INCOMPLETE`\|`AMBIGUOUS-FORMAT`\|`CONTRADICTION`\|`SCHEMA-GAP`), `impact`, `classification` (`BLOCKER:RESOLVED`\|`WARNING`\|`INFO`\|`BLOCKER:CONFIRMED-UNKNOWN`), `flags` (optional — `POTENTIAL-CONTRADICTION`), `linked_questions` (array — `[]` if none), `schema_gap_flag` (optional bool), `decision_request_ref` (optional `DR-xx` ID), `resolution_status` (`UNRESOLVED`\|`RESOLVED`\|`CONFIRMED-UNKNOWN`\|`AWAITING-DECISION`) |
+| `status` | Enum | **REQUIRED** | Set to `DRAFT` on creation, only after the self-check passes. Set to `APPROVED` only by `human:director` action. Never self-set to `APPROVED`. |
 | `created` | ISO 8601 datetime | **REQUIRED** | Set at creation. Never modified after initial write. |
-| `approved_at` | ISO 8601 datetime | Conditional | Required when `status = APPROVED`. Set at the moment of approval. |
+| `approved_at` | ISO 8601 datetime | Conditional | Required when `status = APPROVED`. Set to the datetime of the **human approval action** — not the executor's processing timestamp. In asynchronous workflows these are distinct events; the human action timestamp is authoritative. |
 | `approved_by` | String | Conditional | Required when `status = APPROVED`. Must be the name of the `human:director` actor as declared in `human_actors`. |
+| `approval_statement` | String | Conditional | Required when `status = APPROVED`. Verbatim words from `human:director`'s approval response, minimum 5 words. Must be authored by the human — not a template phrase generated by the executor. |
 
 #### Source traceability record
 
@@ -138,34 +141,37 @@ This record is not delivered to `human:director` for approval — it is retained
 
 ### Summary
 
-Step 1 is done when all nine conditions are simultaneously true:
+Step 1 is done when all ten conditions are simultaneously true:
 
-1. `project-manifest.md` exists at the canonical path
+1. `project-manifest.yaml` exists at the canonical path
 2. `status` field is `APPROVED`
 3. All required fields are non-empty
 4. Every field value is traceable to a source in the brief or a recorded clarification
 5. No value was invented
-6. Every gap and ambiguity identified during processing is present in `open_questions` with its classification
+6. Every gap and ambiguity identified during processing is present in `open-questions-register.yaml` with its classification
 7. All contradictions in the brief were resolved and recorded before the manifest was drafted
 8. `APPROVED` status was set by `human:director`'s explicit action — not by the process that produced the manifest
 9. The approval is timestamped and attributed to the named `human:director` actor
+10. An `approval_statement` containing `human:director`'s verbatim words is recorded in the manifest
 
 ### Unambiguous Requirement Breakdown
 
-#### DoD 1 — `project-manifest.md` exists at the canonical path
+#### DoD 1 — `project-manifest.yaml` exists at the canonical path
 
-- The file exists at `[project-root]/.framework/project-manifest.md`
+- The file exists at `[project-root]/.framework/project-manifest.yaml`
 - The file is not empty
-- The file is valid markdown
-- **Fails if:** The file is missing, the file is at a different path, the file is present but empty, the path convention has not been established yet (this surfaces a missing bootstrap prerequisite)
+- The file is valid YAML
+- The companion `project-manifest.traceability.yaml` exists at `[project-root]/.framework/traceability/project-manifest.traceability.yaml`
+- **Fails if:** Either file is missing, either file is at a different path, either file is present but empty, or the path convention has not been established yet
 
 #### DoD 2 — `status` field is `APPROVED`
 
 - The `status` field is present in the document
 - The field value is exactly `APPROVED` (case-sensitive)
-- The `approved_at` field is present and contains a valid ISO 8601 datetime
+- The `approved_at` field is present and contains a valid ISO 8601 datetime with timezone — set to the **human approval action** timestamp, not the executor's processing timestamp
 - The `approved_by` field is present and matches the name of a `human:director` actor in `human_actors`
-- **Fails if:** `status` is `DRAFT`, the field is missing, `approved_at` is absent, `approved_by` is absent, or `approved_by` does not match any `human:director` entry
+- The `approval_statement` field is present and contains verbatim words from `human:director`'s approval response, minimum 5 words
+- **Fails if:** `status` is `DRAFT`, the field is missing, `approved_at` is absent or contains an executor timestamp, `approved_by` is absent or does not match any `human:director` entry, or `approval_statement` is absent or contains fewer than 5 words
 
 #### DoD 3 — All required fields are non-empty
 
@@ -189,12 +195,13 @@ Step 1 is done when all nine conditions are simultaneously true:
 - Optional field values that were absent in the brief must be recorded as empty — not populated with reasonable assumptions
 - **Fails if:** Any field contains information with no traceable source, any optional field is populated with inferred or assumed content without a corresponding `open_questions` entry documenting the assumption
 
-#### DoD 6 — Every gap and ambiguity is in `open_questions`
+#### DoD 6 — Every gap and ambiguity is in `open-questions-register.yaml`
 
-- Every required field that was absent in the original brief and resolved through clarification has a `BLOCKING_RESOLVED` entry in `open_questions`
-- Every optional field that was absent in the brief has a `WARNING` or `LOW_RISK` entry in `open_questions`
+- Every required field that was absent in the original brief and resolved through clarification has a `BLOCKER:RESOLVED` entry in the register
+- Every optional field that was absent in the brief has a `WARNING` or `INFO` entry in the register
 - Every field that was ambiguous in the brief (present but unclear) has an entry recording the ambiguity and how it was resolved, or confirming it remained unresolved
-- **Fails if:** `open_questions` is empty on a manifest where the brief was known to be incomplete, or if an ambiguity that was identified during processing has no corresponding entry
+- Every `non_mappable[]` entry from `brief-inventory.yaml` has either a register entry or a documented no-entry decision
+- **Fails if:** The register is empty on a manifest where the brief was known to be incomplete, or if an ambiguity that was identified during processing has no corresponding entry, or if any `non_mappable[]` entry was silently skipped
 
 #### DoD 7 — Contradictions were resolved before drafting
 
@@ -212,9 +219,17 @@ Step 1 is done when all nine conditions are simultaneously true:
 
 #### DoD 9 — Approval is timestamped and attributed
 
-- `approved_at` contains the exact datetime of the approval action in ISO 8601 format with timezone
+- `approved_at` contains the exact datetime of the **human approval action** in ISO 8601 format with timezone
 - `approved_by` contains the name of the `human:director` actor exactly as recorded in `human_actors`
-- **Fails if:** Either field is absent, either field contains a placeholder value, the datetime is not in ISO 8601 format, or `approved_by` does not match the `human_actors` record
+- **Fails if:** Either field is absent, either field contains a placeholder value, the datetime is not in ISO 8601 format, `approved_by` does not match the `human_actors` record, or `approved_at` was set to the executor's processing timestamp rather than the human's action timestamp
+
+#### DoD 10 — `approval_statement` is present and verbatim
+
+- `approval_statement` is present in the manifest
+- The value contains the verbatim words of `human:director`'s approval response
+- Minimum 5 words
+- The value was not generated by the executor — it is a direct quotation of what `human:director` wrote or said
+- **Fails if:** The field is absent, the value is fewer than 5 words, or the value is a template phrase authored by the executor rather than a quotation from `human:director`
 
 ***
 
@@ -226,24 +241,55 @@ These are the discrete units of work that take the inputs and produce the output
 
 ### Task 1.1 — Brief Inventory
 
-**Question:** What is in the brief, and does it map to the required schema?
+**Question:** What is in the brief, and how does it map to the required schema?
 
 **Input:** Raw project brief (in whatever form received)
 
-**Output:** A classified inventory — every element of the brief mapped to a manifest field, or noted as non-mappable; every required field classified as `PRESENT`, `ABSENT`, or `AMBIGUOUS`
+**Output:** `brief-inventory.yaml` — a single structured YAML document with four arrays:
+- `statements[]` — every meaningful statement in the brief, each tagged with a schema field mapping or `NON_MAPPABLE`
+- `fields[]` — one entry per manifest field, with a presence classification and `gap_type` where applicable
+- `non_mappable[]` — statements that do not map to any manifest field
+- `contradictions[]` — pairs of statements that are in apparent conflict
 
-**Subtasks:**
-- Read the brief in full before beginning any classification
-- For each required field in the manifest schema: identify whether the brief contains sufficient information to populate it
-- For each optional field: identify whether the brief contains relevant information
-- Note any information in the brief that does not map to any field — this may indicate scope, constraints, or out-of-scope material not yet captured
-- Note any apparent contradictions between elements of the brief
+**Standing precondition for all subtasks:** Read the brief in full before beginning any subtask. Do not begin classification before the full brief has been read.
+
+**Subtask 1 — Statement inventory:**
+For each meaningful statement in the brief, create an entry in `statements[]` with:
+- `text`: the statement verbatim or faithfully paraphrased
+- `maps_to`: the manifest field name it maps to, or `NON_MAPPABLE` if no field applies
+
+**Subtask 2 — Field classification:**
+For each manifest schema field, create an entry in `fields[]` with:
+- `field`: the field name
+- `presence`: one of `PRESENT` / `ABSENT` / `AMBIGUOUS`
+- `gap_type` (required when `presence ≠ PRESENT`):
+  - `ABSENT` — no information provided
+  - `AMBIGUOUS-INCOMPLETE` — partial information present (some but not all needed)
+  - `AMBIGUOUS-FORMAT` — information present but not in a valid field format
+
+This `gap_type` classification propagates directly to Task 1.3 question formulation — it determines the type of question asked. Do not skip it.
+
+**Subtask 3 — Contradiction detection:**
+Scan across all sections of the brief. Contradictions can span required and optional sections, and can exist between a field value and known domain knowledge — do not limit scanning to required fields only.
+
+For each apparent conflict, create an entry in `contradictions[]` with:
+- `statements`: the two conflicting items (by reference or verbatim)
+- `classification`:
+  - `CONTRADICTION` — the conflict is determinable without domain expertise
+  - `POTENTIAL-CONTRADICTION` — resolving it requires domain expertise the executor does not hold; add `contradiction_flag: true`
+
+**Subtask 4 — Non-mappable classification:**
+For each statement tagged `NON_MAPPABLE` in `statements[]`, create an entry in `non_mappable[]` with:
+- `text`: the statement
+- `reason`: why it does not map to any current schema field
+- `downstream_consequence`: whether it has implications for Step 2, Step 3, or later (yes/no with a brief note)
 
 **Done when:**
-- Every required field is classified
-- Every optional field has a `PRESENT` or `ABSENT` classification
-- Apparent contradictions are noted
-- Non-mappable information is noted for consideration
+- Every required and optional schema field has a `fields[]` entry with `presence` classification
+- Every statement in the brief has a `statements[]` entry
+- `contradictions[]` is complete — including inter-section and domain-knowledge-dependent conflicts
+- `non_mappable[]` contains every statement tagged `NON_MAPPABLE`
+- `brief-inventory.yaml` is written and filed
 
 ***
 
@@ -251,43 +297,123 @@ These are the discrete units of work that take the inputs and produce the output
 
 **Question:** Which gaps are blocking and which can be surfaced as open questions?
 
-**Input:** Classified inventory from Task 1.1
+**Required inputs before beginning:**
+- `brief-inventory.yaml` from Task 1.1
+- Step 2 policy document (loaded as reference material — Gate 1 cannot be applied without knowledge of what each downstream step needs per field)
+- Step 3 policy document (same reason)
+- Manifest template conditional sections table (maps tech stack patterns to triggered optional sections)
 
-**Output:** A two-tier gap list: `BLOCKING` items (must be resolved before drafting) and `OPEN_QUESTIONS` (will be documented in the manifest but do not block drafting)
+**Output:** `open-questions-register.yaml` — this is Task 1.2's primary output. It is not a separate intermediate document. Every gap identified across all subtasks produces a register entry.
 
-**Subtasks:**
-- For each `ABSENT` or `AMBIGUOUS` required field: apply the classification test — *would getting this wrong, or proceeding without it, cause Step 2 or Step 3 to fail?* If yes: `BLOCKING`. If no: `OPEN_QUESTION`
-- For each `ABSENT` optional field: classify as `WARNING` (has downstream impact on quality) or `LOW_RISK` (no downstream dependency)
-- For each contradiction noted in Task 1.1: classify as `BLOCKING` — contradictions are never downgraded
+**Gap severity vocabulary:**
+- `BLOCKER` — must be resolved before the manifest can be drafted
+- `WARNING` — step may proceed; downstream impact is known and specific
+- `INFO` — step may proceed; downstream impact is negligible
+
+**Terminal states for BLOCKER entries:**
+- `BLOCKER:RESOLVED` — resolved through the clarification protocol (Task 1.3)
+- `BLOCKER:CONFIRMED-UNKNOWN` — `human:director` confirmed they cannot provide this; downgraded to open question
+
+**Gates (applied per field):**
+- **Gate 1:** *"Would proceeding without this, or getting it wrong, cause Step 2 or Step 3 to fail?"* YES → `BLOCKER`; NO → apply Gate 2
+- **Gate 2:** *"Does the absence of this field have a known, specific downstream quality impact?"* YES → `WARNING`; NO → `INFO`
+- **Gate 3 (independent, applied when a value is present):** *"Does the value supplied satisfy the field's type, domain, and constraint requirements?"* NO → `BLOCKER`, regardless of Gate 1/2 results. A required field with an invalid value fails Gate 3 even though Gate 1 returns NO (a value was present). The `appetite` case is canonical: a value was present but violated domain constraints — Gates 1 and 2 both miss this without Gate 3.
+
+**Subtask 1 — Required field gaps:**
+For each `fields[]` entry with `presence ≠ PRESENT` and REQUIRED constraint:
+- Apply Gates 1, 2, and 3 in sequence
+- Create a register entry with: `question_id`, `field`, `gap`, `gap_type` (from the `fields[]` entry), `impact`, `classification`, `linked_questions: []`, `resolution_status: UNRESOLVED`
+
+**Subtask 2 — Optional field gaps:**
+For each optional field in `fields[]`:
+- Apply classification gates (1, 2, and Gate 3 if a value is present but suspect)
+- Consult the conditional sections table: if the tech stack pattern makes an optional field contextually required, promote to `BLOCKER` if absent
+- Every optional field must be explicitly assessed — fields classified as having no downstream impact still require a documented assessment. Silent skipping is not acceptable.
+- **Done condition:** The executor must be able to affirm explicitly that every optional field was assessed and either received a register entry or a documented no-entry decision.
+
+**Subtask 3 — Contradiction classification:**
+For each entry in `contradictions[]`:
+- `CONTRADICTION`: classify as `BLOCKER`
+- `POTENTIAL-CONTRADICTION`: classify as `WARNING` with `flags: POTENTIAL-CONTRADICTION` and `contradiction_flag: true`. The step does not attempt to resolve the contradiction autonomously. If the contradiction is confirmed during Task 1.3, the entry is immediately reclassified `BLOCKER` and FC-3 is re-invoked.
+
+**Linking pass (explicit named step — run after Subtask 3, before Subtask 4):**
+For each register entry, set `linked_questions` bidirectionally: for every entry A that references entry B's `question_id` in its `linked_questions`, confirm that entry B also references entry A. Task 1.3 queries this field to detect consolidation opportunities and propagate resolutions — bidirectionality must be correct before Task 1.3 begins.
+
+**Subtask 4 — Non-mappable statement classification:**
+For each entry in `non_mappable[]` from `brief-inventory.yaml`:
+- Assess: does this statement have downstream consequences (Step 2, Step 3, or later)?
+- If yes: create a register entry. If no manifest schema field exists to hold this information, set `gap_type: SCHEMA-GAP`, `schema_gap_flag: true`, and optionally `candidate_field` naming the proposed new field
+- If no downstream consequences: record a documented no-entry decision for that statement
+- **Done condition:** The executor must be able to affirm explicitly that every `non_mappable[]` entry was assessed — no silent skipping.
 
 **Done when:**
-- Every gap has a classification
-- Every contradiction has been identified as a `BLOCKING` item
-- The gap list distinguishes items that prevent drafting from items that can be documented and surfaced at the human review gate
+- `open-questions-register.yaml` exists and contains entries for every gap from Subtasks 1–4
+- Every register entry has a complete schema including `gap_type`, `linked_questions`, and `classification`
+- Every optional field and every `non_mappable[]` entry has been explicitly assessed (with register entry or documented decision)
+- The bidirectional linking pass is complete
+- No register entry is missing because it was silently skipped
 
 ***
 
-### Task 1.3 — Clarification Resolution *(conditional — only if `BLOCKING` items exist)*
+### Task 1.3 — Clarification Resolution *(conditional — only if `BLOCKER` items exist)*
 
 **Question:** Can each blocking gap be resolved by asking `human:director` directly?
 
-**Input:** `BLOCKING` gap list from Task 1.2; feedback channel to `human:director`
+**Input:** `open-questions-register.yaml` from Task 1.2; feedback channel to `human:director`
 
-**Output:** Resolved values for all `BLOCKING` gaps, or confirmation that a gap is genuinely unknown (which becomes a documented `OPEN_QUESTION` rather than a blocking gap)
+**Output:** Resolved values for all `BLOCKER` gaps, or confirmation that a gap is genuinely unknown (downgraded to open question), or a Decision Request record (`DR-xx`) for undecided choices
 
-**Subtasks:**
-- For each `BLOCKING` item: formulate a specific, answerable question — one question per item, not a consolidated list
-- Record the question with: the field it relates to, why it is blocking, and the date/time asked
-- Receive and record the answer with: the answer content, the date/time received, and attribution to `human:director`
-- Reclassify the item: either `BLOCKING_RESOLVED` (answer received), or `BLOCKING_CONFIRMED_UNKNOWN` (human:director confirmed they cannot answer — downgrade to `OPEN_QUESTION`)
-- Repeat until all `BLOCKING` items are resolved or confirmed unknown
+**Subtask 1 — Question formulation and exchange delivery:**
 
-**This task may loop.** Each loop is a single question-and-answer exchange. There is no maximum number of loops. The exit condition is: no remaining `BLOCKING` items that have neither a resolved value nor a `CONFIRMED_UNKNOWN` status.
+Apply `gap_type` → question type mapping to determine the question form:
+- `ABSENT` → value-retrieval: *"What is your X?"*
+- `AMBIGUOUS-INCOMPLETE` → value-completeness: *"You've mentioned X — can you confirm [specific missing element]?"*
+- `AMBIGUOUS-FORMAT` → choice-based, presenting valid options: *"You said X — which of these valid values best matches: [options]?"*
+- `CONTRADICTION` → disambiguation naming both values: *"Your brief contains two statements that appear to conflict: [A] and [B]. Which is correct?"*
+
+Each question must be:
+- One sentence, maximum 25 words, addressing a single gap — not compound
+- Named by field: *"Which version of Node.js are you running?"* not *"What's the runtime?"*
+- Optionally accompanied by a parenthetical retrieval instruction (e.g., "run `node --version` to check") — permitted provided it does not constitute a compound question or a decision prompt
+- Accompanied by a one-sentence impact statement
+
+One question per gap. All questions delivered in a **single batch exchange** — not sequentially, not one at a time.
+
+Create the exchange record shell (`CE-1-[seq].yaml`) and file it **before delivery**. Set `initiated_at` at the moment of sending — record creation and delivery are the same moment. Any gap between them is an audit integrity issue.
+
+Group questions by domain for presentation (identity, technical, governance, scope). Present with the instruction: *"Please respond per-question, referencing the question number (e.g., Q1: ..., Q2: ...)."*
+
+**Subtask 2 — Receive and pre-process response:**
+
+Receive `human:director`'s response. If the response does not reference question numbers, map each response element to a question before proceeding. Mapping must be complete before any register entry is updated.
+
+**Subtask 3 — Response classification and register update:**
+
+**Classify before act.** For each response, classify first — before updating any register entry:
+
+| Classification | Condition | Action |
+|---|---|---|
+| `RESOLVED` | A specific, usable value is provided | Write `resolved_value` in the exchange record; update register entry to `BLOCKER:RESOLVED` |
+| `CONFIRMED-UNKNOWN` | `human:director` confirmed they cannot provide this | Update register to `BLOCKER:CONFIRMED-UNKNOWN`; downgrade to `WARNING` open question |
+| `DECISION-REQUIRED` | The underlying decision has not been made | FC-9 Human Decision Support Protocol is invoked immediately. Entry remains `BLOCKER`; step enters `AWAITING-DECISION` for this entry. |
+| `UNCLEAR` | Response is present but does not clearly map to one of the above | Identify the single follow-up question that resolves the ambiguity; re-present to `human:director`. `initiated_at` of the original exchange does not change; add `follow_up_requested_at` timestamp to the exchange record. |
+
+**Derivation-flagged responses:** *"Latest stable"* and equivalent deferred version references are valid `RESOLVED` responses but are not final manifest values. When this occurs:
+- Set `derivation_flag: true` on the exchange record entry
+- Note in `resolution_note` that version resolution is required before field population
+- Task 1.4 will treat these as pre-drafting derivation items — they must not be written directly to the manifest as-stated
+
+**Linked entry propagation (explicit named step — after classifying each response):**
+For each `RESOLVED` entry, query the register for all entries with this entry's `question_id` in their `linked_questions` field. Apply the same resolution to those entries, citing the same exchange reference. A resolved contradiction that leaves its linked ambiguity entry in OPEN status is a register integrity failure.
+
+**This task may loop.** Each loop is a single question-and-answer exchange for the unresolved BLOCKER items. Exit condition: no `BLOCKER` entries remain with status other than `BLOCKER:RESOLVED`, `BLOCKER:CONFIRMED-UNKNOWN`, or `AWAITING-DECISION`.
 
 **Done when:**
-- No `BLOCKING` items remain without a status of `RESOLVED` or `CONFIRMED_UNKNOWN`
-- Every question asked and every answer received is recorded with timestamp and attribution
-- Contradictions resolved through this task have a documented resolution rationale
+- No `BLOCKER` entries remain in UNRESOLVED status
+- Every question asked and every answer received is recorded in the exchange record (`CE-1-xx`) with timestamp and attribution
+- All `derivation_flag: true` entries are present and flagged for pre-drafting resolution in Task 1.4
+- Linked entry propagation has been applied for every `RESOLVED` entry
+- `BLOCKER:CONFIRMED-UNKNOWN` entries have been downgraded to open questions in the register
 
 ***
 
@@ -295,30 +421,53 @@ These are the discrete units of work that take the inputs and produce the output
 
 **Question:** Can all confirmed values be structured into a valid, traceable manifest?
 
-**Input:** Classified inventory (1.1), gap classification (1.2), resolved clarifications (1.3 if run), project manifest template
+**Input:** `brief-inventory.yaml` (1.1), `open-questions-register.yaml` (1.2), exchange records from Task 1.3 (if run), project manifest template
 
-**Output:** `project-manifest.md` in `DRAFT` status
+**Output:** `project-manifest.yaml` in `DRAFT` status, with companion `project-manifest.traceability.yaml`
 
-**Subtasks:**
-- Open the manifest template and begin populating fields
-- For each required field: populate with the confirmed value, or write the `OPEN_QUESTION` entry if the gap was confirmed unknown
-- For each optional field: populate with the confirmed value, or record as `none stated` / `[]`
-- For each `open_questions` entry: include `field`, `gap`, `impact`, and `classification`
-- Build the source traceability record alongside the manifest — every field value is entered with its source before moving to the next field
-- Set `status` to `DRAFT`
-- Set `created` to the current datetime in ISO 8601 format
-- Do not set `approved_at` or `approved_by` — these are set only at Task 1.5
+**Subtask 1 — Pre-drafting derivation resolution:**
 
-**Self-check before completing this task:**
+Before any manifest field is written, query all exchange records for entries with `derivation_flag: true`. For each:
+- Resolve to a specific, pinnable value (e.g., *"latest stable Node.js"* → `22.x`)
+- Record in `project-manifest.traceability.yaml` with `source_type: derivation_rule` and the derivation rule name
+- If the lookup is unavailable (no external access, no determinable value): the value becomes `BLOCKER:CONFIRMED-UNKNOWN`; update the register entry accordingly; the manifest field will be written as empty with an `open_questions` entry. Guessing a version number is not a fallback.
+
+If any required field has no valid source after derivation resolution, create a new register entry before beginning Subtask 2. Task 1.4 is a quality gate — it must catch any Task 1.2 omissions before drafting begins.
+
+**Subtask 2 — Field population:**
+
+Populate the manifest field by field. Build `project-manifest.traceability.yaml` alongside — every field value is entered with its source **before** moving to the next field. Do not reconstruct traceability after drafting; post-drafting reconstruction cannot be independently verified.
+
+For each **required field**: populate with the confirmed value, or write the `open_questions` entry if the gap was confirmed unknown.
+
+For each **optional field**:
+- If a confirmed value exists: populate
+- If `AMBIGUOUS` (partial or tentative information from the brief): record what was said verbatim, note it is tentative, and cross-reference the open question ID. Do not record a tentative value as confirmed. Do not leave the field empty without explanation.
+- If absent: record as `none stated` / `[]`
+
+For the **`description` field**: include project type, primary purpose, and key deliverable. Exclude constraints, deployment details, and named actors — these have dedicated fields. Every sentence must trace to a specific brief statement. The executor's voice does not appear — do not rephrase for perceived clarity in ways that could alter meaning.
+
+For **`tech_stack` and `dev_environment.package_manager`**: the same package manager (e.g., `pnpm`) may appear in both. This duplication is intentional and permitted — do not remove a value from one field to avoid duplication.
+
+If a **version-less tech stack entry** is discovered mid-drafting (not caught in Subtask 1): pause field population, create a register entry, resolve via derivation, then write. Pre-drafting may not catch every derivation-dependent field.
+
+**Subtask 3 — Self-check:**
+
+Run the self-check **before** setting `status: DRAFT`. Status `DRAFT` is the executor's assertion of completeness — setting it before the check inverts the purpose.
+
+Self-check items:
 - All required fields are non-empty
 - No value was entered without a corresponding traceability entry
 - `tech_stack` has at least one named technology
 - `human_actors` has at least one `human:director` entry
-- `appetite` is one of the three valid values
-- `status` is `DRAFT`
+- `appetite` is one of the three valid enum values (`small` / `medium` / `large`)
+- Every `AMBIGUOUS` optional field has a tentative-value note and a register cross-reference
 - Every contradiction resolution is documented in `open_questions`
+- `project-manifest.traceability.yaml` covers every non-empty field
 
-**Done when:** The manifest is complete against the schema, `status = DRAFT`, and the source traceability record covers every non-empty field
+Set `status: DRAFT` and `created: [ISO 8601 datetime]` only after all self-check items pass.
+
+**Done when:** `project-manifest.yaml` is complete against the schema, `status = DRAFT`, and `project-manifest.traceability.yaml` was produced field-by-field during drafting and covers every non-empty field
 
 ***
 
@@ -326,29 +475,68 @@ These are the discrete units of work that take the inputs and produce the output
 
 **Question:** Does `human:director` confirm that the manifest accurately represents their intent?
 
-**Input:** `DRAFT` project-manifest.md from Task 1.4
+**Input:** `project-manifest.yaml` in `DRAFT` status from Task 1.4; `project-manifest.traceability.yaml`
 
-**Output:** `APPROVED` project-manifest.md, or `RETURNED` manifest with specific corrections
+**Output:** `project-manifest.yaml` in `APPROVED` status
 
-**Subtasks:**
-- Present the draft manifest to `human:director` for review
-- `human:director` reads the manifest and either:
-  - **Approves:** confirms the manifest accurately represents their intent; no corrections required
-  - **Returns with corrections:** identifies specific fields that are wrong, missing, or misrepresent their intent; each correction is specific and actionable
-- If `RETURNED`:
-  - Apply each correction to the manifest
-  - Update the source traceability record for any changed fields
-  - Verify no new gaps were introduced by the corrections
-  - Return to the beginning of Task 1.5 with the corrected draft
-- If `APPROVED`:
-  - Record the approval action with timestamp
-  - Set `status` to `APPROVED`
-  - Set `approved_at` to the datetime of the approval action (ISO 8601 with timezone)
-  - Set `approved_by` to the name of the `human:director` actor as recorded in `human_actors`
+**Subtask 1 — Prepare and deliver the review package:**
 
-**This task may loop.** Each revision cycle is one `RETURNED` → correction → re-review loop. There is no maximum number of cycles. The exit condition is explicit `APPROVED` status.
+Generate a summary from the manifest using a deterministic rendering rule (one summary value per manifest field — no synthesis or editorial interpretation). Before delivery, validate every summary value against its corresponding manifest field. A rendering error means `human:director` approves a summary that does not match the canonical document — validation is a required step, not optional.
 
-**Done when:** `status = APPROVED`, `approved_at` is set, `approved_by` is set and matches the `human:director` entry in `human_actors`, and the approval action is on record
+Review package includes:
+- The validated summary
+- The full `open_questions` list (so `human:director` sees what is unresolved)
+- A clear instruction: *"To return with a correction: identify the specific field and the correct value."* — without this, a vague correction cannot be classified
+
+Record `presented_at` at the time of delivery.
+
+**Subtask 2 — Receive response.**
+
+**Subtask 3 — Response classification:**
+
+Classify before act:
+
+| Classification | Condition | Action |
+|---|---|---|
+| `APPROVED` | Deliberate affirmation: "approved," "confirmed," "yes, that's correct" | Proceed to Subtask 5 |
+| `UNCLEAR` | Ambiguous: "looks good to me," "mostly right," "sure," "fine" | See UNCLEAR handling below |
+| `RETURNED` | Identifies specific field(s) and correct value(s) | Proceed to Subtask 4 |
+
+**Minimum approval statement:** Valid affirmations: "approved," "confirmed," "yes, that's correct," or equivalent unambiguous language. "Looks good," "fine," "sure," "mostly right" are `UNCLEAR`, not `APPROVED`. This is a classification rule — not a judgment call.
+
+**`UNCLEAR` handling:** Identify the single question that resolves the ambiguity. Re-present with that question. `presented_at` does not change. Return to Subtask 2.
+
+**`RETURNED` — scope change detection (before applying any correction):** Check whether the corrected field's value was used to resolve a prior `BLOCKER` register entry. If yes, assess whether the correction invalidates that resolution before applying it. Example: removing the *static* constraint re-opens the Workers/Pages deployment question. This is a targeted register check — not a full Task 1.2 re-run.
+
+**Subtask 4 — Apply corrections:**
+
+Classify each correction before application:
+- **Value correction** — a change to an existing field's value: apply directly; update `project-manifest.traceability.yaml` for the changed field
+- **Scope addition** — new content not present in the manifest (not a correction to an existing value): route through a lightweight mini Task 1.1–1.3 cycle before the manifest is updated. Do not apply scope additions in the same pass as value corrections.
+
+After corrections, re-run the self-check against changed fields and any fields that depend on them. Full self-check only if a structurally significant field changed (e.g., `tech_stack`, `deployment_target`, `human_actors`).
+
+**Correction loop health checks:**
+- If the same field is corrected twice: flag `UNSTABLE-FIELD`; request `human:director` make a single definitive statement about that specific field before re-presenting the full manifest
+- After three correction cycles without approval: surface the loop pattern explicitly to `human:director` — name which cycles have occurred and ask what is preventing approval. Do not continue silent cycling.
+
+**Re-presentation format (after each correction pass):** Include a change summary naming, for each corrected field: the field name, the previous value, and the corrected value. This allows `human:director` to confirm the correction was applied without re-reading unchanged content.
+
+Return to Subtask 1 with the corrected draft.
+
+**Subtask 5 — Record approval:**
+
+- Record the approval action in the audit log. Reference the audit log specification by file path — do not define the entry format inline. Inline formats drift from the canonical schema.
+- Set `status` to `APPROVED`
+- Set `approved_at` to the datetime of the **human approval action** — the datetime of `human:director`'s response, not the executor's processing timestamp. In asynchronous workflows these are distinct events; the human's timestamp is authoritative.
+- Set `approved_by` to the name of the `human:director` actor as recorded in `human_actors`
+- Set `approval_statement` to the verbatim words of `human:director`'s approval response, minimum 5 words. Must be a direct quotation — not a template phrase generated by the executor.
+
+**Post-approval immutability:** Once `status: APPROVED` is set, neither `project-manifest.yaml` nor `project-manifest.traceability.yaml` may be modified. Any post-approval correction requires returning to `DRAFT` status and completing a full Task 1.5 re-run.
+
+**This task may loop** through Subtasks 1–4. Exit condition: explicit `APPROVED` status with all Subtask 5 steps complete.
+
+**Done when:** `status = APPROVED`, `approved_at` (human action timestamp), `approved_by`, and `approval_statement` are all set and consistent with the `human_actors` record, the approval action is recorded in the audit log, and neither the manifest nor its traceability record has been modified after the approval was recorded
 
 ***
 
@@ -360,7 +548,7 @@ These elements emerged from detailing Step 1 but do not belong within Step 1's p
 The constraint that no output field value may be invented — everything must trace to a source — is not unique to Step 1. It applies wherever structured output is produced from human-provided or structured input. This belongs as a framework-level constraint referenced by step policies, not defined within them.
 
 **F2 — The Gap Classification Taxonomy**
-The `BLOCKING` / `OPEN_QUESTION` / `WARNING` / `LOW_RISK` classification system is reusable. Step 2 will need to classify gaps in the tech stack declaration against environment contract fields. The same taxonomy applies. Define it once at framework level.
+The `BLOCKER` / `WARNING` / `INFO` classification system is reusable. Step 2 will need to classify gaps in the tech stack declaration against environment contract fields. The same taxonomy applies. Define it once at framework level (see FC-2).
 
 **F3 — The Clarification Protocol**
 The rules for how to request clarification from a human — one question per item, record question and answer with timestamps, attribution — are not Step 1-specific. Any step that encounters a blocking gap and has a human feedback channel will need the same protocol. Define once.

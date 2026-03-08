@@ -6,7 +6,6 @@ tools:
   - get_context_card
   - get_my_capabilities
   - get_current_state
-  - search_knowledge_base
   - raise_uncertainty
   # Task-scoped tools are populated here at activation time.
   # See get_my_capabilities for the live list.
